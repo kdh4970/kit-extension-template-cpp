@@ -72,17 +72,17 @@ protected:
         // Create Xformation for the Mesh
         PXR_NS::UsdGeomXformable xformable = PXR_NS::UsdGeomXformable(mesh_prim);
 
-        // Setup the translation operation.
-        const PXR_NS::GfVec3f translation(0.0f, 1000.0f, 0.0f);
+        Setup the translation operation.
+        const PXR_NS::GfVec3f translation(0.0f, 0.0f, 1.0f);
         xformable.AddTranslateOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(translation);
 
-        // Setup the scale operation.
-        const PXR_NS::GfVec3f scale(1000.0f, 1000.0f, 1000.0f);
-        xformable.AddScaleOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(scale);
+        // // Setup the scale operation.
+        // const PXR_NS::GfVec3f scale(1000.0f, 1000.0f, 1000.0f);
+        // xformable.AddScaleOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(scale);
 
-        // Setup the rotation operation.
-        const PXR_NS::GfVec3f rotation(-90.0f, 0.0f, 0.0f);
-        xformable.AddRotateXYZOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(rotation);
+        // // Setup the rotation operation.
+        // const PXR_NS::GfVec3f rotation(-90.0f, 0.0f, 0.0f);
+        // xformable.AddRotateXYZOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(rotation);
 
 
         // Subscribe to timeline events so we know when to start or stop animating the prims.
@@ -110,6 +110,7 @@ protected:
 
         // Remove Mesh Prims
         m_stage->RemovePrim(mesh_prim.GetPath());
+    }
 
     void printStageInfo() const override
     {
@@ -308,6 +309,7 @@ protected:
         auto under_sec = std::chrono::duration_cast<std::chrono::microseconds>(curr-sec);
         double curr_time = sec.count() + (under_sec.count()/1000000.0);
         printf("End to End Time (from capture to update): %f\n", curr_time - capture_time);
+    }
 
     void InitSHM() override
     {

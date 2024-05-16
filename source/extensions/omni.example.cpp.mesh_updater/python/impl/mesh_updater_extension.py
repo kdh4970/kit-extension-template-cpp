@@ -59,6 +59,7 @@ class MeshUpdaterExtension(omni.ext.IExt):
         # # Animate the example prims from C++.
         _mesh_updater_interface.start_timeline_animation()
 
+        
 
     def on_shutdown(self):
         global _mesh_updater_interface
@@ -78,7 +79,10 @@ class MeshUpdaterExtension(omni.ext.IExt):
 
     def _on_stage_event(self, event):
         # print("Stage event: ", event.type)
+        # omni.kit.commands.execute('ClearPhysicsComponentsCommand', stage=omni.usd.get_context().get_stage(), prim_paths=['/World/mymesh'])
         if event.type == int(omni.usd.StageEventType.OPENED):
             _mesh_updater_interface.on_default_usd_stage_changed(omni.usd.get_context().get_stage_id())
+            # omni.kit.commands.execute("CreateCollidersCommand",stage=omni.usd.get_context().get_stage(),prim_paths="/World/mymesh")
         elif event.type == int(omni.usd.StageEventType.CLOSED):
             _mesh_updater_interface.on_default_usd_stage_changed(0)
+       
