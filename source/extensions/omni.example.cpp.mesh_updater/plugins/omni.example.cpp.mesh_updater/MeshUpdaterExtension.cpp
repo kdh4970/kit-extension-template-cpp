@@ -68,8 +68,6 @@ protected:
         mesh.CreateFaceVertexCountsAttr();
         mesh.CreateFaceVertexIndicesAttr();
 
-        time_list.reserve(1000);
-
         // Below Xform is for Omniverse, not for IsaacSim
         // Create Xformation for the Mesh
         PXR_NS::UsdGeomXformable xformable = PXR_NS::UsdGeomXformable(mesh_prim);
@@ -86,36 +84,6 @@ protected:
         const PXR_NS::GfVec3f rotation(-90.0f, 0.0f, 0.0f);
         xformable.AddRotateXYZOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(rotation);
 
-
-        // // Set the size of the cube prim.
-        // const double cubeSize = 0.5 / PXR_NS::UsdGeomGetStageMetersPerUnit(m_stage);
-        // prim.CreateAttribute(PXR_NS::TfToken("size"), PXR_NS::SdfValueTypeNames->Double).Set(cubeSize);
-
-        // // Leave the first prim at the origin and position the rest in a circle surrounding it.
-        // if (i == 0)
-        // {
-        //     m_primsWithRotationOps.push_back({ prim });
-        // }
-        // else
-        // {
-        //     PXR_NS::UsdGeomXformable xformable = PXR_NS::UsdGeomXformable(prim);
-
-        //     // Setup the global rotation operation.
-        //     const float initialRotation = rotationIncrement * static_cast<float>(i);
-        //     PXR_NS::UsdGeomXformOp globalRotationOp = xformable.AddRotateYOp(PXR_NS::UsdGeomXformOp::PrecisionFloat);
-        //     globalRotationOp.Set(initialRotation);
-
-        //     // Setup the translation operation.
-        //     const PXR_NS::GfVec3f translation(0.0f, 0.0f, cubeSize * 4.0f);
-        //     xformable.AddTranslateOp(PXR_NS::UsdGeomXformOp::PrecisionFloat).Set(translation);
-
-        //     // Setup the local rotation operation.
-        //     PXR_NS::UsdGeomXformOp localRotationOp = xformable.AddRotateXOp(PXR_NS::UsdGeomXformOp::PrecisionFloat);
-        //     localRotationOp.Set(initialRotation);
-
-        //     // Store the prim and rotation ops so we can update them later in animatePrims().
-        //     m_primsWithRotationOps.push_back({ prim, localRotationOp, globalRotationOp });
-        // }
 
         // Subscribe to timeline events so we know when to start or stop animating the prims.
         if (auto timeline = omni::timeline::getTimeline())
@@ -142,14 +110,6 @@ protected:
 
         // Remove Mesh Prims
         m_stage->RemovePrim(mesh_prim.GetPath());
-
-        // Remove all prims.
-        // for (auto& primWithRotationOps : m_primsWithRotationOps)
-        // {
-        //     m_stage->RemovePrim(primWithRotationOps.m_prim.GetPath());
-        // }
-        // m_primsWithRotationOps.clear();
-    }
 
     void printStageInfo() const override
     {
@@ -348,62 +308,16 @@ protected:
         auto under_sec = std::chrono::duration_cast<std::chrono::microseconds>(curr-sec);
         double curr_time = sec.count() + (under_sec.count()/1000000.0);
         printf("End to End Time (from capture to update): %f\n", curr_time - capture_time);
-        if(time_list.size() < 1000 && curr_time - capture_time > 0.0)
-        {
-            time_list.push_back(curr_time - capture_time);
-        }
-        if(time_list.size() == 1000)
-        {
-            // write to file
-            FILE* fp = fopen("/home/do/Documents/final_time_measurement.txt", "w");
-            for(int i=0; i<1000; i++)
-            {
-                fprintf(fp, "%f\n", time_list[i]);
-            }
-            fclose(fp);
-        }
-
-        // // Update the value of each local and global rotation operation to (crudely) animate the prims around the origin.
-        // const size_t numPrims = m_primsWithRotationOps.size();
-        // const float initialLocalRotationIncrement = 360.0f / (numPrims - 1); // Ignore the first prim at the origin.
-        // const float initialGlobalRotationIncrement = 360.0f / (numPrims - 1); // Ignore the first prim at the origin.
-        // const float currentAnimTime = omni::timeline::getTimeline()->getCurrentTime() * m_stage->GetTimeCodesPerSecond();
-        // for (size_t i = 1; i < numPrims; ++i) // Ignore the first prim at the origin.
-        // {
-        //     if (m_primsWithRotationOps[i].m_invalid)
-        //     {
-        //         continue;
-        //     }
-
-        //     PXR_NS::UsdGeomXformOp& localRotationOp = m_primsWithRotationOps[i].m_localRotationOp;
-        //     const float initialLocalRotation = initialLocalRotationIncrement * static_cast<float>(i);
-        //     const float currentLocalRotation = initialLocalRotation + (360.0f * (currentAnimTime / 100.0f));
-        //     localRotationOp.Set(currentLocalRotation);
-
-        //     PXR_NS::UsdGeomXformOp& globalRotationOp = m_primsWithRotationOps[i].m_globalRotationOp;
-        //     const float initialGlobalRotation = initialGlobalRotationIncrement * static_cast<float>(i);
-        //     const float currentGlobalRotation = initialGlobalRotation - (360.0f * (currentAnimTime / 100.0f));
-        //     globalRotationOp.Set(currentGlobalRotation);
-        // }
-    }
 
     void InitSHM() override
     {
         SHM.init(1000);
-
-        // for (int i = 0; i < 100; i++)
-        // {
-        //     printf(">> Iteration %d\n", i);
-        //     SHM.ReadAndDeserializeBinary();
-        // }
     }
 
 private:
     struct PrimWithRotationOps
     {
         PXR_NS::UsdPrim m_prim;
-        // PXR_NS::UsdGeomXformOp m_localRotationOp;
-        // PXR_NS::UsdGeomXformOp m_globalRotationOp;
         bool m_invalid = false;
     };
 
@@ -416,8 +330,6 @@ private:
     PXR_NS::UsdPrim mesh_prim;
     PXR_NS::UsdGeomMesh mesh;
     SharedMemoryReader SHM;
-
-    std::vector<double> time_list;
 };
 
 }
