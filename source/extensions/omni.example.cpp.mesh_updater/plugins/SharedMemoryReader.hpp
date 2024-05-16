@@ -132,7 +132,6 @@ public:
 
     LockSemaphore();
 
-    // _start = std::chrono::high_resolution_clock::now();
     const char* ptr = _shmptr;
 
     std::memcpy(&_mesh.capture_time, ptr, sizeof(_mesh.capture_time));
@@ -152,27 +151,10 @@ public:
     std::memcpy(_mesh.triangles, ptr, _mesh.num_triangles * sizeof(int3_t));
     ptr += _mesh.num_triangles * sizeof(int3_t);
 
-    // for (int i=0; i<_mesh.num_vertices; i++)
-    // {
-    //   if(i>=5 && i<_mesh.num_vertices-5) continue;
-
-    //   printf("Vertex[%d]: %f %f %f\n", i, _mesh.vertices[i].x, _mesh.vertices[i].y, _mesh.vertices[i].z);
-    // }
-    // for (int i=0; i<_mesh.num_triangles; i++)
-    // {
-    //   if (i>=5 && i<_mesh.num_triangles-5) continue;
-    //   printf("Triangle[%d]: %d %d %d\n", i, _mesh.triangles[i].x, _mesh.triangles[i].y, _mesh.triangles[i].z);
-    // }
     memset(_shmptr, 0, _size);
 
     UnlockSemaphore();
 
-    _end = std::chrono::high_resolution_clock::now();
-    // std::chrono::duration<double> elapsed_time = std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start);
-
-
-
-    // printf("[Read] Elapsed time: %f\n", elapsed_time.count());
   }
 
   double GetCaptureTime()
